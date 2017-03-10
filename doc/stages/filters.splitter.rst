@@ -3,9 +3,9 @@
 filters.splitter
 ===============================================================================
 
-The splitter filter breaks a point cloud into square tiles of a size that
-you choose.  The origin of the tiles is chosen arbitrarily unless specified
-as an option.
+The splitter filter breaks a point cloud into square or cubic tiles of a size
+that you choose.  The origin of the tiles is chosen arbitrarily unless
+specified as an option.
 
 The splitter takes a single PointView as its input and creates a PointView
 for each tile as its output.
@@ -48,3 +48,9 @@ origin_x
 origin_y
   Y Origin of the tiles.  [Default: none (chosen arbitarily)]
 
+origin_z
+  Z origin of the tiles.  [Default: none (chosen arbitarily)]
+
+use_z
+  Whether Z dimensions are considered when creating tiles. origin_z has no
+  effect if use_z is false.  [Default: **false**]

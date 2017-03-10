@@ -55,6 +55,8 @@ TEST(SplitterTest, test_tile_filter)
     Options o;
     Option length("length", 1000);
     o.add(length);
+    Option usez("use_z", true);
+    o.add(usez);
 
     // create the tile filter and prepare
     SplitterFilter s;
@@ -76,15 +78,16 @@ TEST(SplitterTest, test_tile_filter)
     StageWrapper::done(s, table);
 
     std::vector<PointViewPtr> views;
-    std::map<PointViewPtr, BOX2D> bounds;
+    std::map<PointViewPtr, BOX3D> bounds;
 
     for (auto it = viewSet.begin(); it != viewSet.end(); ++it)
     {
-        BOX2D b;
+        BOX3D b;
         PointViewPtr v = *it;
         v->calculateBounds(b);
         EXPECT_TRUE(b.maxx - b.minx <= 1000);    
         EXPECT_TRUE(b.maxy - b.miny <= 1000);    
+        EXPECT_TRUE(b.maxz - b.minz <= 1000);
 
         for (auto& p : bounds)
             EXPECT_FALSE(p.second.overlaps(b));
@@ -95,12 +98,15 @@ TEST(SplitterTest, test_tile_filter)
 
     auto sorter = [&bounds](PointViewPtr p1, PointViewPtr p2)
     {
-        BOX2D b1 = bounds[p1];
-        BOX2D b2 = bounds[p2];
+        BOX3D b1 = bounds[p1];
+        BOX3D b2 = bounds[p2];
 
         return b1.minx < b2.minx ?  true :
             b1.minx > b2.minx ? false :
-            b1.miny < b2.miny;
+            b1.miny < b2.miny ? true :
+            b1.miny > b2.miny ? false :
+            b1.minz < b2.minz ? true :
+            false;
     };
     std::sort(views.begin(), views.end(), sorter);
 
