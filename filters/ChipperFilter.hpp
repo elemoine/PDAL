@@ -65,7 +65,8 @@ class PDAL_DLL ChipPtRef
 private:
     double m_pos;
     point_count_t m_ptindex;
-    uint32_t m_oindex;
+    uint32_t m_o1index;
+    uint32_t m_o2index;
 
 public:
     bool operator < (const ChipPtRef& pt) const
@@ -126,12 +127,16 @@ private:
     virtual PointViewSet run(PointViewPtr view);
 
     void load(PointView& view, ChipRefList& xvec,
-        ChipRefList& yvec, ChipRefList& spare);
+        ChipRefList& yvec, ChipRefList& zvec, ChipRefList& spare1, ChipRefList& spare2);
     void partition(point_count_t size);
-    void decideSplit(ChipRefList& v1, ChipRefList& v2,
+    void decideSplit2D(ChipRefList& v1, ChipRefList& v2,
         ChipRefList& spare, PointId left, PointId right);
-    void split(ChipRefList& wide, ChipRefList& narrow,
+    void split2D(ChipRefList& wide, ChipRefList& narrow,
         ChipRefList& spare, PointId left, PointId right);
+    void decideSplit3D(ChipRefList& v1, ChipRefList& v2, ChipRefList& v3,
+        ChipRefList& spare1, ChipRefList& spare2, PointId left, PointId right);
+    void split3D(ChipRefList& wide, ChipRefList& narrow1, ChipRefList& narrow2,
+        ChipRefList& spare1, ChipRefList& spare2, PointId left, PointId right);
     void emit(ChipRefList& wide, PointId widemin, PointId widemax);
 
     PointId m_threshold;
@@ -140,7 +145,10 @@ private:
     std::vector<PointId> m_partitions;
     ChipRefList m_xvec;
     ChipRefList m_yvec;
-    ChipRefList m_spare;
+    ChipRefList m_zvec;   // used when m_useZ is true
+    ChipRefList m_spare1;
+    ChipRefList m_spare2; // used when m_useZ is true
+    bool m_useZ;
 
     ChipperFilter& operator=(const ChipperFilter&); // not implemented
     ChipperFilter(const ChipperFilter&); // not implemented
